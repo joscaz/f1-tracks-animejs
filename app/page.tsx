@@ -7,12 +7,28 @@ import { tracks, Track } from "./data/tracks";
 export default function Home() {
   const [selectedTrack, setSelectedTrack] = useState<Track>(tracks[0]);
   const [isAnimating, setIsAnimating] = useState(true);
+  const [dynamicViewBox, setDynamicViewBox] = useState('');
+  const [carScale, setCarScale] = useState(1);
   const pathRef = useRef<SVGPathElement>(null);
   const carRef = useRef<SVGGElement>(null);
   const animationRef = useRef<any>(null);
 
   useEffect(() => {
     if (!pathRef.current || !carRef.current) return;
+
+    // 1. Calculate dynamic viewBox to center and fit the track
+    const bbox = pathRef.current.getBBox();
+    const padding = Math.max(bbox.width, bbox.height) * 0.1; // 10% padding
+    const newViewBox = `${bbox.x - padding} ${bbox.y - padding} ${bbox.width + padding * 2} ${bbox.height + padding * 2}`;
+    setDynamicViewBox(newViewBox);
+
+    // 2. Normalize car scale
+    // We want the car to be roughly the same visual size regardless of the track's coordinate system scale
+    // Reference: a "standard" track might have a dimension of 1000 units
+    const referenceDimension = 1000;
+    const currentMaxDim = Math.max(bbox.width, bbox.height);
+    const newScale = currentMaxDim / referenceDimension;
+    setCarScale(newScale);
 
     // Reset animations if switching tracks
     if (animationRef.current) {
@@ -25,13 +41,13 @@ export default function Home() {
     // Animate the car along the path
     animationRef.current = animate(carRef.current, {
       ...motionPath,
-      duration: 10000,
+      duration: 8000,
       loop: true,
       ease: "linear",
       autoplay: isAnimating
     });
 
-    // Suble path drawing effect on mount
+    // Subtle path drawing effect on mount
     animate(svg.createDrawable(pathRef.current), {
       draw: "0 1",
       duration: 2000,
@@ -63,7 +79,7 @@ export default function Home() {
             <div>
               <h2 className="text-red-600 font-black tracking-tighter text-sm uppercase mb-1">Live Track Telemetry</h2>
               <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-none uppercase italic">
-                {selectedTrack.name.split(' ').map((word, i) => (
+                {selectedTrack.name.split(' ').map((word: string, i: number) => (
                   <span key={i} className={i === 0 ? "text-white" : "text-white/40"}>
                     {word}{" "}
                   </span>
@@ -94,15 +110,15 @@ export default function Home() {
             
             <div className="absolute inset-0 flex items-center justify-center p-12 md:p-20">
               <svg 
-                viewBox={selectedTrack.viewBox} 
-                className="w-full h-full drop-shadow-[0_0_30px_rgba(220,38,38,0.2)]"
+                viewBox={dynamicViewBox} 
+                className="w-full h-full drop-shadow-[0_0_30px_rgba(220,38,38,0.2)] transition-all duration-700 ease-in-out"
                 fill="none"
               >
                 {/* Track Glow */}
                 <path
                   d={selectedTrack.path}
                   stroke="rgba(220,38,38,0.1)"
-                  strokeWidth="20"
+                  strokeWidth={20 * carScale}
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
@@ -113,7 +129,7 @@ export default function Home() {
                   id="track-path"
                   d={selectedTrack.path}
                   stroke="white"
-                  strokeWidth="4"
+                  strokeWidth={4 * carScale}
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   className="opacity-20"
@@ -121,15 +137,17 @@ export default function Home() {
 
                 {/* Animated Car */}
                 <g ref={carRef} style={{ pointerEvents: 'none' }}>
-                  {/* Car Glow */}
-                  <circle r="8" fill="rgba(220,38,38,0.4)" className="animate-pulse" />
-                  {/* Car Body */}
-                  <path 
-                    d="M-6,-4 L8,0 L-6,4 Z" 
-                    fill="#dc2626" 
-                    stroke="white" 
-                    strokeWidth="1.5"
-                  />
+                  <g transform={`scale(${carScale})`}>
+                    {/* Car Glow */}
+                    <circle r="8" fill="rgba(220,38,38,0.4)" className="animate-pulse" />
+                    {/* Car Body */}
+                    <path 
+                      d="M-6,-4 L8,0 L-6,4 Z" 
+                      fill="#dc2626" 
+                      stroke="white" 
+                      strokeWidth="1.5"
+                    />
+                  </g>
                 </g>
               </svg>
             </div>
@@ -170,16 +188,19 @@ export default function Home() {
           </div>
 
           <div className="p-8 rounded-3xl bg-white/[0.02] border border-white/5 relative overflow-hidden">
-             <div className="absolute top-0 right-0 p-4 opacity-10">
+             {/* <div className="absolute top-0 right-0 p-4 opacity-10">
                 <svg viewBox="0 0 24 24" className="w-12 h-12 fill-white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-             </div>
-             <h3 className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-4">How it works</h3>
+             </div> */}
+             <h3 className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-4">Random Facts</h3>
              <p className="text-sm text-white/60 leading-relaxed font-medium">
-               Using <code className="text-red-400 bg-red-400/10 px-1.5 py-0.5 rounded text-[12px]">svg.createMotionPath()</code> from AnimeJS v4, we extract the geometric data of any SVG path.
-               This data is then applied to the car's transform, allowing it to trace the circuit with perfect precision, including automatic rotation.
+               <ul className="list-disc list-inside">
+                 {selectedTrack.facts.map((fact: string) => (
+                   <li key={fact}>{fact}</li>
+                 ))}
+               </ul>
              </p>
              <div className="mt-6 flex flex-wrap gap-2">
-                {['AnimeJS v4', 'Next.js 16', 'SVG Motion'].map(tag => (
+                {selectedTrack.tags.map((tag: string) => (
                   <span key={tag} className="text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/5 border border-white/5 text-white/40">
                     {tag}
                   </span>
