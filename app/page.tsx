@@ -71,10 +71,10 @@ export default function Home() {
       {/* Background radial gradient for depth */}
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(220,38,38,0.05)_0%,_transparent_50%)] pointer-events-none" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-12 md:py-20 lg:grid lg:grid-cols-[1fr_400px] lg:gap-16 items-center">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-12 lg:py-0 lg:h-screen lg:flex lg:items-center lg:gap-16">
         
-        {/* Left Section: Circuit Visualization */}
-        <section className="flex flex-col gap-8">
+        {/* Left Section: Circuit Visualization (Sticky-like via flex) */}
+        <section className="flex-1 flex flex-col gap-8 py-12 lg:py-20">
           <div className="flex items-end justify-between border-b border-white/10 pb-6">
             <div>
               <h2 className="text-red-600 font-black tracking-tighter text-sm uppercase mb-1">Live Track Telemetry</h2>
@@ -154,20 +154,20 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Right Section: Controls & Info */}
-        <aside className="mt-12 lg:mt-0 flex flex-col gap-10">
-          <div>
-            <h3 className="text-xs font-bold text-white/30 uppercase tracking-[0.2em] mb-6">Select Circuit</h3>
-            <div className="grid gap-3">
+        {/* Right Section: Controls & Info (Independently scrollable on large screens) */}
+        <aside className="w-full lg:w-[400px] h-full py-12 lg:py-20 flex flex-col gap-10 overflow-hidden">
+          <div className="flex flex-col flex-1 min-h-0">
+            <h3 className="text-xs font-bold text-white/30 uppercase tracking-[0.2em] mb-6 shrink-0">Select Circuit</h3>
+            <div className="flex-1 overflow-y-auto pr-4 space-y-3 custom-scrollbar">
               {tracks.map((track) => (
                 <button
                   key={track.id}
                   onClick={() => setSelectedTrack(track)}
                   className={`
-                    group relative flex items-center justify-between p-5 rounded-2xl border transition-all duration-300
+                    w-full group relative flex items-center justify-between p-5 rounded-2xl border transition-all duration-300
                     ${selectedTrack.id === track.id 
                       ? "bg-white/5 border-white/20 ring-1 ring-white/10 shadow-2xl" 
-                      : "bg-transparent border-white/5 hove:bg-white/[0.02] hover:border-white/10"
+                      : "bg-transparent border-white/5 hover:bg-white/[0.02] hover:border-white/10"
                     }
                   `}
                 >
@@ -176,7 +176,7 @@ export default function Home() {
                       {track.name}
                     </span>
                     <span className="text-[10px] font-medium text-white/20 uppercase tracking-wider italic">
-                      {track.location.split(',')[1]}
+                      {track.location.split(',')[1] || track.location}
                     </span>
                   </div>
                   {selectedTrack.id === track.id && (
@@ -187,20 +187,17 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="p-8 rounded-3xl bg-white/[0.02] border border-white/5 relative overflow-hidden">
-             {/* <div className="absolute top-0 right-0 p-4 opacity-10">
-                <svg viewBox="0 0 24 24" className="w-12 h-12 fill-white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
-             </div> */}
+          <div className="p-8 rounded-3xl bg-white/[0.02] border border-white/5 relative overflow-hidden shrink-0">
              <h3 className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-4">Random Facts</h3>
-             <p className="text-sm text-white/60 leading-relaxed font-medium">
-               <ul className="list-disc list-inside">
-                 {selectedTrack.facts.map((fact: string) => (
+             <div className="text-sm text-white/60 leading-relaxed font-medium">
+               <ul className="list-disc list-inside space-y-2">
+                 {selectedTrack.facts?.map((fact: string) => (
                    <li key={fact}>{fact}</li>
                  ))}
                </ul>
-             </p>
+             </div>
              <div className="mt-6 flex flex-wrap gap-2">
-                {selectedTrack.tags.map((tag: string) => (
+                {selectedTrack.tags?.map((tag: string) => (
                   <span key={tag} className="text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/5 border border-white/5 text-white/40">
                     {tag}
                   </span>
