@@ -212,7 +212,7 @@ export default function Home() {
           
           {/* Footer Decoration (Local within sidebar) */}
           <div className="mt-auto pt-10 opacity-20 flex justify-between items-center text-[10px] font-mono tracking-tighter">
-             <div>DATA_STREAM :: FORMULA_SVG_READY</div>
+             <div>DATA_STREAM :: FORMULA_SVG_READY CSM EL ND</div>
              <div className="uppercase">AG-F1-ENGINE</div>
           </div>
         </aside>
