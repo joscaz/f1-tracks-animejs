@@ -67,17 +67,17 @@ export default function Home() {
   }, [isAnimating]);
 
   return (
-    <main className="min-h-screen bg-[#050505] text-white font-sans selection:bg-red-500/30">
+    <main className="min-h-screen bg-[#050505] text-white font-sans selection:bg-red-500/30 overflow-x-hidden">
       {/* Background radial gradient for depth */}
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(220,38,38,0.05)_0%,_transparent_50%)] pointer-events-none" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-12 lg:py-0 lg:h-screen lg:flex lg:items-center lg:gap-16">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:flex lg:gap-16">
         
-        {/* Left Section: Circuit Visualization (Sticky-like via flex) */}
-        <section className="flex-1 flex flex-col gap-8 py-12 lg:py-20">
-          <div className="flex items-end justify-between border-b border-white/10 pb-6">
+        {/* Left Section: Circuit Visualization (Sticky on Desktop) */}
+        <section className="lg:flex-1 lg:h-screen lg:sticky lg:top-0 flex flex-col justify-center py-12 lg:py-0">
+          <div className="flex items-end justify-between border-b border-white/10 pb-6 mb-8">
             <div>
-              <h2 className="text-red-600 font-black tracking-tighter text-sm uppercase mb-1">F1 2026 Calendar</h2>
+              <h2 className="text-red-600 font-black tracking-tighter text-sm uppercase mb-1">Live Track Telemetry</h2>
               <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-none uppercase italic">
                 {selectedTrack.name.split(' ').map((word: string, i: number) => (
                   <span key={i} className={i === 0 ? "text-white" : "text-white/40"}>
@@ -154,10 +154,12 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Right Section: Controls & Info (Independently scrollable on large screens) */}
-        <aside className="w-full lg:w-[400px] h-full py-12 lg:py-20 flex flex-col gap-10 overflow-hidden">
-          <div className="flex flex-col flex-1 min-h-0">
-            <h3 className="text-xs font-bold text-white/30 uppercase tracking-[0.2em] mb-6 shrink-0">Select Circuit</h3>
+        {/* Right Section: Sidebar (Independently scrolling) */}
+        <aside className="w-full lg:w-[400px] py-12 lg:py-20 flex flex-col gap-10">
+          
+          {/* 1. Track Selection - Fixed height to avoid jumps */}
+          <div className="flex flex-col h-[480px] shrink-0">
+            <h3 className="text-xs font-bold text-white/30 uppercase tracking-[0.2em] mb-6">Select Circuit</h3>
             <div className="flex-1 overflow-y-auto pr-4 space-y-3 custom-scrollbar">
               {tracks.map((track) => (
                 <button
@@ -187,16 +189,19 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="p-8 rounded-3xl bg-white/[0.02] border border-white/5 relative overflow-hidden shrink-0">
+          {/* 2. Random Facts - Dynamic height, naturally flows below */}
+          <div className="p-8 rounded-3xl bg-white/[0.02] border border-white/5 relative overflow-hidden transition-all duration-500">
              <h3 className="text-[10px] font-black text-red-600 uppercase tracking-widest mb-4">Random Facts</h3>
              <div className="text-sm text-white/60 leading-relaxed font-medium">
-               <ul className="list-disc list-inside space-y-2">
+               <ul className="list-disc list-inside space-y-3">
                  {selectedTrack.facts?.map((fact: string) => (
-                   <li key={fact}>{fact}</li>
+                   <li key={fact} className="pl-1">
+                     <span className="relative -left-2">{"" + fact}</span>
+                   </li>
                  ))}
                </ul>
              </div>
-             <div className="mt-6 flex flex-wrap gap-2">
+             <div className="mt-8 flex flex-wrap gap-2 pt-6 border-t border-white/5">
                 {selectedTrack.tags?.map((tag: string) => (
                   <span key={tag} className="text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-white/5 border border-white/5 text-white/40">
                     {tag}
@@ -204,16 +209,15 @@ export default function Home() {
                 ))}
              </div>
           </div>
+          
+          {/* Footer Decoration (Local within sidebar) */}
+          <div className="mt-auto pt-10 opacity-20 flex justify-between items-center text-[10px] font-mono tracking-tighter">
+             <div>DATA_STREAM :: FORMULA_SVG_READY</div>
+             <div className="uppercase">AG-F1-ENGINE</div>
+          </div>
         </aside>
 
       </div>
-      
-      {/* Footer Decoration */}
-      <footer className="fixed bottom-0 left-0 right-0 p-8 flex justify-between items-center pointer-events-none opacity-20">
-         {/* <div className="text-[10px] font-mono tracking-tighter">DATA_STREAM :: FORMULA_SVG_READY</div>
-         <div className="h-[1px] flex-1 mx-8 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-         <div className="text-[10px] font-mono tracking-tighter uppercase">Est. 2025 // AG-F1-ENGINE</div> */}
-      </footer>
     </main>
   );
 }
