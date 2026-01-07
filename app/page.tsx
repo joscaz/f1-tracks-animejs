@@ -196,7 +196,7 @@ export default function Home() {
                <ul className="list-disc list-inside space-y-3">
                  {selectedTrack.facts?.map((fact: string) => (
                    <li key={fact} className="pl-1">
-                     <span className="relative -left-2">{"" + fact}</span>
+                     <span className="relative -left-2">{" " + fact}</span>
                    </li>
                  ))}
                </ul>
