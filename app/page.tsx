@@ -77,7 +77,7 @@ export default function Home() {
         <section className="lg:flex-1 lg:h-screen lg:sticky lg:top-0 flex flex-col justify-center py-12 lg:py-0">
           <div className="flex items-end justify-between border-b border-white/10 pb-6 mb-8">
             <div>
-              <h2 className="text-red-600 font-black tracking-tighter text-sm uppercase mb-1">Live Track Telemetry</h2>
+              <h2 className="text-red-600 font-black tracking-tighter text-sm uppercase mb-1">F1 2026 Calendar</h2>
               <h1 className="text-5xl md:text-7xl font-black tracking-tight leading-none uppercase italic">
                 {selectedTrack.name.split(' ').map((word: string, i: number) => (
                   <span key={i} className={i === 0 ? "text-white" : "text-white/40"}>
